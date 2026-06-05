@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐍 Snake Arcade - Game Portal</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&family=Poppins:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&family=Poppins:wght@400;600;700;800&display=swap');
         
         * {
             margin: 0;
@@ -44,25 +44,47 @@
             50% { opacity: 1; }
         }
         
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 30px 20px;
+        /* ========== LANDING PAGE ========== */
+        .landing {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
             position: relative;
             z-index: 1;
+            text-align: center;
         }
         
-        .header h1 {
+        .landing.hidden {
+            display: none;
+        }
+        
+        /* Snake mascot */
+        .mascot {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 25px;
+            animation: bounce 2s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .landing h1 {
             font-family: 'Press Start 2P', cursive;
-            font-size: 2.5rem;
+            font-size: 3rem;
             background: linear-gradient(45deg, #ff0080, #ff8c00, #ffff00, #00ff00, #0080ff, #8000ff);
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: rainbow 3s ease infinite;
-            text-shadow: 0 0 30px rgba(255,0,128,0.5);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            line-height: 1.3;
         }
         
         @keyframes rainbow {
@@ -71,29 +93,139 @@
             100% { background-position: 0% 50%; }
         }
         
-        .header p {
-            font-size: 1.1rem;
-            color: #b8b8ff;
+        .landing .subtitle {
             font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            color: #b8b8ff;
+            margin-bottom: 35px;
         }
         
-        /* Main container */
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        /* Feature cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,0,128,0.3);
+        }
+        
+        .feature-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card h3 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            color: #ff0080;
+            margin-bottom: 5px;
+        }
+        
+        .feature-card p {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        /* Play button */
+        .btn-play {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(145deg, #ff0080, #ff4da6);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 0 40px rgba(255,0,128,0.5);
+            transition: all 0.3s ease;
+            animation: pulse 2s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(255,0,128,0.5); }
+            50% { box-shadow: 0 0 60px rgba(255,0,128,0.8); }
+        }
+        
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(255,0,128,0.8);
+        }
+        
+        .landing .footer-text {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        /* ========== GAME PAGE ========== */
+        .game-page {
+            display: none;
             padding: 20px;
             position: relative;
             z-index: 1;
         }
         
-        /* Game panel */
+        .game-page.active {
+            display: block;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .game-header h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: #ff0080;
+        }
+        
+        .back-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            padding: 8px 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #ff0080;
+        }
+        
+        /* Game container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
         .game-panel {
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
             padding: 25px;
             border: 2px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 40px rgba(255,0,128,0.2), inset 0 0 60px rgba(255,0,128,0.05);
+            box-shadow: 0 0 40px rgba(255,0,128,0.2);
         }
         
         /* Stats bar */
@@ -142,7 +274,7 @@
         #gameCanvas {
             border: 3px solid #ff0080;
             border-radius: 10px;
-            box-shadow: 0 0 30px rgba(255,0,128,0.4), inset 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 0 30px rgba(255,0,128,0.4);
             background: #1a1a2e;
             max-width: 100%;
         }
@@ -339,7 +471,6 @@
             box-shadow: 0 5px 20px rgba(139,92,246,0.5);
         }
         
-        /* New high score flash */
         .new-highscore {
             display: none;
             color: #ffdd00;
@@ -365,13 +496,15 @@
         
         /* Mobile responsive */
         @media (max-width: 600px) {
-            .header h1 { font-size: 1.2rem; }
+            .landing h1 { font-size: 1.5rem; }
+            .features { grid-template-columns: 1fr; max-width: 300px; }
             .stat-value { font-size: 1.2rem; }
             .stat { min-width: 80px; padding: 10px 15px; }
             .btn { padding: 12px 25px; font-size: 0.9rem; }
             .result-card { padding: 25px; }
             .result-card h2 { font-size: 1.2rem; }
             .result-card .final-score { font-size: 2rem; }
+            .mascot { width: 120px; height: 120px; }
         }
     </style>
 </head>
@@ -379,60 +512,115 @@
     <!-- Stars Background -->
     <div class="stars" id="stars"></div>
     
-    <!-- Header -->
-    <div class="header">
-        <h1>🐍 SNAKE ARCADE</h1>
-        <p>🎮 Game Portal — Makan, Tumbuh, Menang! 🏆</p>
+    <!-- ==================== LANDING PAGE ==================== -->
+    <div class="landing" id="landingPage">
+        <!-- Snake Mascot SVG -->
+        <svg class="mascot" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Body -->
+            <path d="M50 120 Q30 120 30 100 Q30 80 50 80 L70 80 Q90 80 90 60 Q90 40 110 40 L130 40 Q150 40 150 60 Q150 80 170 80 L180 80" 
+                  stroke="url(#snakeGrad)" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Head -->
+            <circle cx="180" cy="80" r="18" fill="#00ff88"/>
+            <!-- Eyes -->
+            <circle cx="186" cy="73" r="5" fill="white"/>
+            <circle cx="186" cy="87" r="5" fill="white"/>
+            <circle cx="188" cy="73" r="2.5" fill="#1a1a2e"/>
+            <circle cx="188" cy="87" r="2.5" fill="#1a1a2e"/>
+            <!-- Tongue -->
+            <path d="M198 80 L210 75 M198 80 L210 85" stroke="#ff0080" stroke-width="2" stroke-linecap="round"/>
+            <!-- Blush -->
+            <circle cx="175" cy="70" r="4" fill="rgba(255,0,128,0.3)"/>
+            <circle cx="175" cy="90" r="4" fill="rgba(255,0,128,0.3)"/>
+            <!-- Gradient -->
+            <defs>
+                <linearGradient id="snakeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#00994d"/>
+                    <stop offset="50%" style="stop-color:#00cc6a"/>
+                    <stop offset="100%" style="stop-color:#00ff88"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        
+        <h1>SNAKE ARCADE</h1>
+        <p class="subtitle">🐍 Game Portal — Makan, Tumbuh, Menang! 🏆</p>
+        
+        <!-- Features -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h3>Level Naik</h3>
+                <p>Semakin banyak makan, semakin cepat larinya!</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">⏱️</div>
+                <h3>Timer 1:30</h3>
+                <p>90 detik untuk kumpulkan skor setinggi mungkin!</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎁</div>
+                <h3>NFT Reward</h3>
+                <p>Dapatkan NFT collectible setelah bermain!</p>
+            </div>
+        </div>
+        
+        <!-- Play Button -->
+        <button class="btn-play" onclick="showGame()">🎮 MULAI MAIN</button>
+        
+        <p class="footer-text">Made with 💜 by Anton for Biliebed | Snake Arcade 2026</p>
     </div>
     
-    <!-- Main Game -->
-    <div class="container">
-        <div class="game-panel">
-            <!-- Stats -->
-            <div class="stats-bar">
-                <div class="stat">
-                    <div class="stat-label">🏆 Skor</div>
-                    <div class="stat-value score" id="score">0</div>
+    <!-- ==================== GAME PAGE ==================== -->
+    <div class="game-page" id="gamePage">
+        <button class="back-btn" onclick="showLanding()">← Kembali</button>
+        
+        <div class="container">
+            <div class="game-panel">
+                <!-- Stats -->
+                <div class="stats-bar">
+                    <div class="stat">
+                        <div class="stat-label">🏆 Skor</div>
+                        <div class="stat-value score" id="score">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">⚡ Level</div>
+                        <div class="stat-value level" id="level">1</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">⏱️ Waktu</div>
+                        <div class="stat-value timer" id="timer">1:30</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">👑 High Score</div>
+                        <div class="stat-value highscore" id="highscore">0</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <div class="stat-label">⚡ Level</div>
-                    <div class="stat-value level" id="level">1</div>
+                
+                <!-- Canvas -->
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="500" height="500"></canvas>
                 </div>
-                <div class="stat">
-                    <div class="stat-label">⏱️ Waktu</div>
-                    <div class="stat-value timer" id="timer">1:30</div>
+                
+                <!-- Controls -->
+                <div class="controls-info">
+                    <p>
+                        <span class="key-hint">W</span>
+                        <span class="key-hint">A</span>
+                        <span class="key-hint">S</span>
+                        <span class="key-hint">D</span>
+                        atau
+                        <span class="key-hint">↑</span>
+                        <span class="key-hint">←</span>
+                        <span class="key-hint">↓</span>
+                        <span class="key-hint">→</span>
+                        untuk bergerak
+                    </p>
                 </div>
-                <div class="stat">
-                    <div class="stat-label">👑 High Score</div>
-                    <div class="stat-value highscore" id="highscore">0</div>
+                
+                <!-- Buttons -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="startBtn" onclick="startGame()">🐍 Mulai Main</button>
+                    <button class="btn btn-secondary" id="resetBtn" onclick="resetGame()" style="display:none;">🔄 Main Lagi</button>
                 </div>
-            </div>
-            
-            <!-- Canvas -->
-            <div class="canvas-container">
-                <canvas id="gameCanvas" width="500" height="500"></canvas>
-            </div>
-            
-            <!-- Controls -->
-            <div class="controls-info">
-                <p>
-                    <span class="key-hint">W</span>
-                    <span class="key-hint">A</span>
-                    <span class="key-hint">S</span>
-                    <span class="key-hint">D</span>
-                    atau
-                    <span class="key-hint">↑</span>
-                    <span class="key-hint">←</span>
-                    <span class="key-hint">↓</span>
-                    <span class="key-hint">→</span>
-                    untuk bergerak
-                </p>
-            </div>
-            
-            <!-- Buttons -->
-            <div class="btn-group">
-                <button class="btn btn-primary" id="startBtn" onclick="startGame()">🐍 Mulai Main</button>
-                <button class="btn btn-secondary" id="resetBtn" onclick="resetGame()" style="display:none;">🔄 Main Lagi</button>
             </div>
         </div>
     </div>
@@ -461,11 +649,6 @@
             <button class="btn btn-primary" onclick="playAgain()">🐍 Main Lagi!</button>
         </div>
     </div>
-    
-    <!-- Footer -->
-    <div class="footer">
-        Made with 💜 by Anton for Biliebed | Snake Arcade 2026
-    </div>
 
     <script>
         // ===== STARS BACKGROUND =====
@@ -478,6 +661,27 @@
             star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
             star.style.animationDelay = Math.random() * 2 + 's';
             starsContainer.appendChild(star);
+        }
+        
+        // ===== PAGE NAVIGATION =====
+        function showGame() {
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('gamePage').classList.add('active');
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('resetBtn').style.display = 'none';
+            showStartScreen();
+        }
+        
+        function showLanding() {
+            // Stop game if playing
+            if (isPlaying) {
+                clearInterval(gameLoop);
+                clearInterval(timerInterval);
+                isPlaying = false;
+            }
+            document.getElementById('gamePage').classList.remove('active');
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.getElementById('gameOverOverlay').classList.remove('active');
         }
         
         // ===== GAME VARIABLES =====
@@ -496,15 +700,10 @@
         let gameSpeed = 150;
         let gameLoop = null;
         let timerInterval = null;
-        let timeLeft = 90; // 1.5 minutes
+        let timeLeft = 90;
         let isPlaying = false;
         let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
         
-        // Colors
-        const SNAKE_COLORS = ['#00ff88', '#00cc6a', '#00994d'];
-        const FOOD_COLORS = ['#ff0080', '#ff4da6', '#ff80bf'];
-        
-        // Update highscore display
         document.getElementById('highscore').textContent = highScore;
         
         // ===== DRAWING FUNCTIONS =====
@@ -513,7 +712,6 @@
                 const x = segment.x * GRID_SIZE;
                 const y = segment.y * GRID_SIZE;
                 
-                // Body gradient
                 const gradient = ctx.createRadialGradient(
                     x + GRID_SIZE/2, y + GRID_SIZE/2, 2,
                     x + GRID_SIZE/2, y + GRID_SIZE/2, GRID_SIZE/2
@@ -525,10 +723,8 @@
                 ctx.shadowColor = '#00ff88';
                 ctx.shadowBlur = index === 0 ? 15 : 5;
                 
-                // Rounded rectangle
-                const radius = 5;
                 ctx.beginPath();
-                ctx.roundRect(x + 1, y + 1, GRID_SIZE - 2, GRID_SIZE - 2, radius);
+                ctx.roundRect(x + 1, y + 1, GRID_SIZE - 2, GRID_SIZE - 2, 5);
                 ctx.fill();
                 
                 // Eyes on head
@@ -578,11 +774,9 @@
             const time = Date.now() / 200;
             const pulse = Math.sin(time) * 3 + GRID_SIZE/2;
             
-            // Glow
             ctx.shadowColor = '#ff0080';
             ctx.shadowBlur = 20;
             
-            // Food body
             const gradient = ctx.createRadialGradient(
                 x + GRID_SIZE/2, y + GRID_SIZE/2, 2,
                 x + GRID_SIZE/2, y + GRID_SIZE/2, pulse
@@ -596,7 +790,6 @@
             ctx.arc(x + GRID_SIZE/2, y + GRID_SIZE/2, pulse - 2, 0, Math.PI * 2);
             ctx.fill();
             
-            // Shine
             ctx.fillStyle = 'rgba(255,255,255,0.6)';
             ctx.beginPath();
             ctx.arc(x + GRID_SIZE/2 - 3, y + GRID_SIZE/2 - 3, 3, 0, Math.PI * 2);
@@ -620,10 +813,22 @@
             }
         }
         
+        function showStartScreen() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#ff0080';
+            ctx.font = '24px "Press Start 2P"';
+            ctx.textAlign = 'center';
+            ctx.fillText('🐍 SNAKE', canvas.width/2, canvas.height/2 - 20);
+            ctx.fillStyle = '#aaa';
+            ctx.font = '12px "Press Start 2P"';
+            ctx.fillText('Klik Mulai Main!', canvas.width/2, canvas.height/2 + 20);
+        }
+        
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Background
             ctx.fillStyle = '#1a1a2e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
@@ -646,7 +851,6 @@
         
         function moveSnake() {
             direction = nextDirection;
-            
             const head = { ...snake[0] };
             
             switch(direction) {
@@ -656,13 +860,11 @@
                 case 'right': head.x++; break;
             }
             
-            // Wrap around
             if (head.x < 0) head.x = GRID_COUNT - 1;
             if (head.x >= GRID_COUNT) head.x = 0;
             if (head.y < 0) head.y = GRID_COUNT - 1;
             if (head.y >= GRID_COUNT) head.y = 0;
             
-            // Self collision
             if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
                 gameOver();
                 return;
@@ -670,7 +872,6 @@
             
             snake.unshift(head);
             
-            // Eat food
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 updateLevel();
@@ -717,7 +918,7 @@
             }
         }
         
-        // ===== SOUND EFFECTS (Web Audio API) =====
+        // ===== SOUND EFFECTS =====
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         function playEatSound() {
@@ -769,7 +970,6 @@
             
             audioCtx.resume();
             
-            // Reset
             snake = [
                 { x: 10, y: 10 },
                 { x: 9, y: 10 },
@@ -804,7 +1004,6 @@
             
             playGameOverSound();
             
-            // Check high score
             let isNewHighScore = false;
             if (score > highScore) {
                 highScore = score;
@@ -813,39 +1012,24 @@
                 isNewHighScore = true;
             }
             
-            // Show game over overlay
             document.getElementById('finalScore').textContent = score;
             document.getElementById('newHighscore').style.display = isNewHighScore ? 'block' : 'none';
             document.getElementById('gameOverOverlay').classList.add('active');
             
-            // Generate NFT
             generateNFT(score);
         }
         
         function resetGame() {
             document.getElementById('startBtn').style.display = 'inline-block';
             document.getElementById('resetBtn').style.display = 'none';
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw start screen
-            ctx.fillStyle = '#ff0080';
-            ctx.font = '24px "Press Start 2P"';
-            ctx.textAlign = 'center';
-            ctx.fillText('🐍 SNAKE', canvas.width/2, canvas.height/2 - 20);
-            ctx.fillStyle = '#aaa';
-            ctx.font = '12px "Press Start 2P"';
-            ctx.fillText('Klik Mulai Main!', canvas.width/2, canvas.height/2 + 20);
+            showStartScreen();
         }
         
         function playAgain() {
             document.getElementById('gameOverOverlay').classList.remove('active');
             document.getElementById('startBtn').style.display = 'inline-block';
             document.getElementById('resetBtn').style.display = 'none';
-            resetGame();
+            showStartScreen();
         }
         
         // ===== CONTROLS =====
@@ -892,14 +1076,12 @@
             const nctx = nftCanvas.getContext('2d');
             const size = 200;
             
-            // Random traits
             const bodyColor1 = `hsl(${Math.random()*360}, 80%, 60%)`;
             const bodyColor2 = `hsl(${Math.random()*360}, 90%, 50%)`;
             const pattern = BODY_PATTERNS[Math.floor(Math.random() * BODY_PATTERNS.length)];
             const bgStyle = BG_STYLES[Math.floor(Math.random() * BG_STYLES.length)];
             const snakeName = NFT_NAMES[Math.floor(Math.random() * NFT_NAMES.length)];
             
-            // Rarity based on score
             let rarity, rarityColor;
             if (finalScore >= 200) { rarity = 'LEGENDARY'; rarityColor = '#ffdd00'; }
             else if (finalScore >= 150) { rarity = 'EPIC'; rarityColor = '#a855f7'; }
@@ -915,7 +1097,6 @@
                     grad.addColorStop(1, '#0a0a1e');
                     nctx.fillStyle = grad;
                     nctx.fillRect(0, 0, size, size);
-                    // Stars
                     for (let i = 0; i < 30; i++) {
                         nctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
                         nctx.beginPath();
@@ -975,7 +1156,6 @@
             nctx.save();
             nctx.translate(size/2 - 30, size/2 - 10);
             
-            // Snake body
             const segments = 8;
             for (let i = segments - 1; i >= 0; i--) {
                 const x = i * 8;
@@ -993,7 +1173,6 @@
                 nctx.roundRect(x - 5, y - 5, 12, 12, 4);
                 nctx.fill();
                 
-                // Pattern
                 nctx.shadowBlur = 0;
                 if (pattern === 'striped' && i % 2 === 0) {
                     nctx.fillStyle = 'rgba(255,255,255,0.3)';
@@ -1013,7 +1192,6 @@
                     nctx.stroke();
                 }
                 
-                // Eyes on head
                 if (i === 0) {
                     nctx.fillStyle = 'white';
                     nctx.beginPath();
@@ -1053,7 +1231,6 @@
             nctx.textAlign = 'left';
             nctx.fillText(`⭐ ${finalScore}`, 12, size - 13);
             
-            // Update NFT info
             document.getElementById('nftName').textContent = `${snakeName} #${Math.floor(Math.random()*9999)}`;
             document.getElementById('nftTraits').innerHTML = `
                 <span>🎨 ${pattern}</span>
@@ -1069,9 +1246,6 @@
             link.href = nftCanvas.toDataURL('image/png');
             link.click();
         }
-        
-        // Initial draw
-        resetGame();
     </script>
 </body>
 </html>
