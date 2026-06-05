@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Snake Arcade - Game Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&family=Poppins:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+        }
+        
+        /* Stars background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ff0080, #ff8c00, #ffff00, #00ff00, #0080ff, #8000ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s ease infinite;
+            text-shadow: 0 0 30px rgba(255,0,128,0.5);
+            margin-bottom: 10px;
+        }
+        
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #b8b8ff;
+            font-family: 'Fredoka One', cursive;
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Game panel */
+        .game-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(255,0,128,0.2), inset 0 0 60px rgba(255,0,128,0.05);
+        }
+        
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.15);
+            min-width: 120px;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+        }
+        
+        .stat-value.score { color: #ff0080; }
+        .stat-value.level { color: #00ff88; }
+        .stat-value.timer { color: #ffaa00; }
+        .stat-value.highscore { color: #ffdd00; }
+        
+        /* Canvas container */
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        #gameCanvas {
+            border: 3px solid #ff0080;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255,0,128,0.4), inset 0 0 30px rgba(0,0,0,0.5);
+            background: #1a1a2e;
+            max-width: 100%;
+        }
+        
+        /* Controls info */
+        .controls-info {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .controls-info p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .key-hint {
+            display: inline-block;
+            background: rgba(255,0,128,0.2);
+            border: 1px solid #ff0080;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            margin: 0 3px;
+            color: #ff0080;
+        }
+        
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(145deg, #ff0080, #ff4da6);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255,0,128,0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255,0,128,0.6);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(145deg, #00ff88, #00cc6a);
+            color: #1a1a2e;
+            box-shadow: 0 5px 20px rgba(0,255,136,0.4);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,255,136,0.6);
+        }
+        
+        /* Game over overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .overlay.active {
+            display: flex;
+        }
+        
+        .result-card {
+            background: linear-gradient(145deg, #1a1a3e, #2a2a5e);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 50px rgba(255,0,128,0.3);
+            animation: popIn 0.5s ease;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .result-card h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ff0080;
+        }
+        
+        .result-card .final-score {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 3rem;
+            color: #ffdd00;
+            margin: 20px 0;
+        }
+        
+        .result-card .result-text {
+            color: #b8b8ff;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        
+        /* NFT Reward Section */
+        .nft-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nft-section h3 {
+            font-family: 'Fredoka One', cursive;
+            color: #ffdd00;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .nft-card {
+            display: inline-block;
+            background: linear-gradient(145deg, #2a2a5e, #1a1a3e);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid #ffdd00;
+            box-shadow: 0 0 30px rgba(255,221,0,0.3);
+        }
+        
+        .nft-card canvas {
+            border-radius: 10px;
+            display: block;
+        }
+        
+        .nft-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: #ffdd00;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .nft-traits {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 8px;
+        }
+        
+        .nft-traits span {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin: 2px;
+        }
+        
+        .btn-download {
+            margin-top: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            padding: 10px 25px;
+            background: linear-gradient(145deg, #8b5cf6, #6d28d9);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139,92,246,0.5);
+        }
+        
+        /* New high score flash */
+        .new-highscore {
+            display: none;
+            color: #ffdd00;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            animation: flash 0.5s ease infinite alternate;
+        }
+        
+        @keyframes flash {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.2rem; }
+            .stat-value { font-size: 1.2rem; }
+            .stat { min-width: 80px; padding: 10px 15px; }
+            .btn { padding: 12px 25px; font-size: 0.9rem; }
+            .result-card { padding: 25px; }
+            .result-card h2 { font-size: 1.2rem; }
+            .result-card .final-score { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Header -->
+    <div class="header">
+        <h1>🐍 SNAKE ARCADE</h1>
+        <p>🎮 Game Portal — Makan, Tumbuh, Menang! 🏆</p>
+    </div>
+    
+    <!-- Main Game -->
+    <div class="container">
+        <div class="game-panel">
+            <!-- Stats -->
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-label">🏆 Skor</div>
+                    <div class="stat-value score" id="score">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">⚡ Level</div>
+                    <div class="stat-value level" id="level">1</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">⏱️ Waktu</div>
+                    <div class="stat-value timer" id="timer">1:30</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">👑 High Score</div>
+                    <div class="stat-value highscore" id="highscore">0</div>
+                </div>
+            </div>
+            
+            <!-- Canvas -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="500" height="500"></canvas>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls-info">
+                <p>
+                    <span class="key-hint">W</span>
+                    <span class="key-hint">A</span>
+                    <span class="key-hint">S</span>
+                    <span class="key-hint">D</span>
+                    atau
+                    <span class="key-hint">↑</span>
+                    <span class="key-hint">←</span>
+                    <span class="key-hint">↓</span>
+                    <span class="key-hint">→</span>
+                    untuk bergerak
+                </p>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()">🐍 Mulai Main</button>
+                <button class="btn btn-secondary" id="resetBtn" onclick="resetGame()" style="display:none;">🔄 Main Lagi</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Over Overlay -->
+    <div class="overlay" id="gameOverOverlay">
+        <div class="result-card">
+            <h2>🎮 GAME OVER!</h2>
+            <div class="final-score" id="finalScore">0</div>
+            <p class="result-text">Poin yang kamu kumpulkan!</p>
+            <div class="new-highscore" id="newHighscore">⭐ NEW HIGH SCORE! ⭐</div>
+            
+            <!-- NFT Reward -->
+            <div class="nft-section">
+                <h3>🎁 Hadiah NFT Kamu!</h3>
+                <div class="nft-card">
+                    <canvas id="nftCanvas" width="200" height="200"></canvas>
+                    <div class="nft-name" id="nftName">Loading...</div>
+                    <div class="nft-traits" id="nftTraits"></div>
+                </div>
+                <br>
+                <button class="btn-download" onclick="downloadNFT()">💾 Download NFT</button>
+            </div>
+            
+            <br>
+            <button class="btn btn-primary" onclick="playAgain()">🐍 Main Lagi!</button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        Made with 💜 by Anton for Biliebed | Snake Arcade 2026
+    </div>
+
+    <script>
+        // ===== STARS BACKGROUND =====
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            starsContainer.appendChild(star);
+        }
+        
+        // ===== GAME VARIABLES =====
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const GRID_SIZE = 20;
+        const GRID_COUNT = canvas.width / GRID_SIZE;
+        
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let nextDirection = 'right';
+        let score = 0;
+        let level = 1;
+        let gameSpeed = 150;
+        let gameLoop = null;
+        let timerInterval = null;
+        let timeLeft = 90; // 1.5 minutes
+        let isPlaying = false;
+        let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+        
+        // Colors
+        const SNAKE_COLORS = ['#00ff88', '#00cc6a', '#00994d'];
+        const FOOD_COLORS = ['#ff0080', '#ff4da6', '#ff80bf'];
+        
+        // Update highscore display
+        document.getElementById('highscore').textContent = highScore;
+        
+        // ===== DRAWING FUNCTIONS =====
+        function drawSnake() {
+            snake.forEach((segment, index) => {
+                const x = segment.x * GRID_SIZE;
+                const y = segment.y * GRID_SIZE;
+                
+                // Body gradient
+                const gradient = ctx.createRadialGradient(
+                    x + GRID_SIZE/2, y + GRID_SIZE/2, 2,
+                    x + GRID_SIZE/2, y + GRID_SIZE/2, GRID_SIZE/2
+                );
+                gradient.addColorStop(0, '#00ff88');
+                gradient.addColorStop(1, '#00994d');
+                
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = '#00ff88';
+                ctx.shadowBlur = index === 0 ? 15 : 5;
+                
+                // Rounded rectangle
+                const radius = 5;
+                ctx.beginPath();
+                ctx.roundRect(x + 1, y + 1, GRID_SIZE - 2, GRID_SIZE - 2, radius);
+                ctx.fill();
+                
+                // Eyes on head
+                if (index === 0) {
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'white';
+                    let eyeX1, eyeY1, eyeX2, eyeY2;
+                    
+                    switch(direction) {
+                        case 'right':
+                            eyeX1 = x + 12; eyeY1 = y + 5;
+                            eyeX2 = x + 12; eyeY2 = y + 12;
+                            break;
+                        case 'left':
+                            eyeX1 = x + 5; eyeY1 = y + 5;
+                            eyeX2 = x + 5; eyeY2 = y + 12;
+                            break;
+                        case 'up':
+                            eyeX1 = x + 5; eyeY1 = y + 5;
+                            eyeX2 = x + 12; eyeY2 = y + 5;
+                            break;
+                        case 'down':
+                            eyeX1 = x + 5; eyeY1 = y + 12;
+                            eyeX2 = x + 12; eyeY2 = y + 12;
+                            break;
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.arc(eyeX1, eyeY1, 3, 0, Math.PI * 2);
+                    ctx.arc(eyeX2, eyeY2, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#1a1a2e';
+                    ctx.beginPath();
+                    ctx.arc(eyeX1, eyeY1, 1.5, 0, Math.PI * 2);
+                    ctx.arc(eyeX2, eyeY2, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.shadowBlur = 0;
+            });
+        }
+        
+        function drawFood() {
+            const x = food.x * GRID_SIZE;
+            const y = food.y * GRID_SIZE;
+            const time = Date.now() / 200;
+            const pulse = Math.sin(time) * 3 + GRID_SIZE/2;
+            
+            // Glow
+            ctx.shadowColor = '#ff0080';
+            ctx.shadowBlur = 20;
+            
+            // Food body
+            const gradient = ctx.createRadialGradient(
+                x + GRID_SIZE/2, y + GRID_SIZE/2, 2,
+                x + GRID_SIZE/2, y + GRID_SIZE/2, pulse
+            );
+            gradient.addColorStop(0, '#ff80bf');
+            gradient.addColorStop(0.7, '#ff0080');
+            gradient.addColorStop(1, '#cc0066');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x + GRID_SIZE/2, y + GRID_SIZE/2, pulse - 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Shine
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.beginPath();
+            ctx.arc(x + GRID_SIZE/2 - 3, y + GRID_SIZE/2 - 3, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+        }
+        
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < GRID_COUNT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * GRID_SIZE, 0);
+                ctx.lineTo(i * GRID_SIZE, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * GRID_SIZE);
+                ctx.lineTo(canvas.width, i * GRID_SIZE);
+                ctx.stroke();
+            }
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawGrid();
+            drawFood();
+            drawSnake();
+        }
+        
+        // ===== GAME LOGIC =====
+        function spawnFood() {
+            let newFood;
+            do {
+                newFood = {
+                    x: Math.floor(Math.random() * GRID_COUNT),
+                    y: Math.floor(Math.random() * GRID_COUNT)
+                };
+            } while (snake.some(seg => seg.x === newFood.x && seg.y === newFood.y));
+            food = newFood;
+        }
+        
+        function moveSnake() {
+            direction = nextDirection;
+            
+            const head = { ...snake[0] };
+            
+            switch(direction) {
+                case 'up': head.y--; break;
+                case 'down': head.y++; break;
+                case 'left': head.x--; break;
+                case 'right': head.x++; break;
+            }
+            
+            // Wrap around
+            if (head.x < 0) head.x = GRID_COUNT - 1;
+            if (head.x >= GRID_COUNT) head.x = 0;
+            if (head.y < 0) head.y = GRID_COUNT - 1;
+            if (head.y >= GRID_COUNT) head.y = 0;
+            
+            // Self collision
+            if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
+                gameOver();
+                return;
+            }
+            
+            snake.unshift(head);
+            
+            // Eat food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                updateLevel();
+                spawnFood();
+                playEatSound();
+            } else {
+                snake.pop();
+            }
+            
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateLevel() {
+            const newLevel = Math.floor(score / 50) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                gameSpeed = Math.max(60, 150 - (level - 1) * 15);
+                clearInterval(gameLoop);
+                gameLoop = setInterval(gameStep, gameSpeed);
+                document.getElementById('level').textContent = level;
+                playLevelUpSound();
+            }
+        }
+        
+        function gameStep() {
+            moveSnake();
+            draw();
+        }
+        
+        function updateTimer() {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 10) {
+                document.getElementById('timer').style.color = '#ff0000';
+                document.getElementById('timer').style.animation = 'flash 0.5s ease infinite alternate';
+            }
+            
+            if (timeLeft <= 0) {
+                gameOver();
+            }
+        }
+        
+        // ===== SOUND EFFECTS (Web Audio API) =====
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playEatSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 600;
+            osc.type = 'sine';
+            gain.gain.value = 0.3;
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+        
+        function playLevelUpSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 800;
+            osc.type = 'square';
+            gain.gain.value = 0.2;
+            setTimeout(() => osc.frequency.value = 1200, 100);
+            setTimeout(() => osc.frequency.value = 1600, 200);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        function playGameOverSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 400;
+            osc.type = 'sawtooth';
+            gain.gain.value = 0.3;
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+        
+        // ===== GAME CONTROL =====
+        function startGame() {
+            if (isPlaying) return;
+            isPlaying = true;
+            
+            audioCtx.resume();
+            
+            // Reset
+            snake = [
+                { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+            direction = 'right';
+            nextDirection = 'right';
+            score = 0;
+            level = 1;
+            gameSpeed = 150;
+            timeLeft = 90;
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('level').textContent = '1';
+            document.getElementById('timer').textContent = '1:30';
+            document.getElementById('timer').style.color = '#ffaa00';
+            document.getElementById('timer').style.animation = 'none';
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+            
+            spawnFood();
+            gameLoop = setInterval(gameStep, gameSpeed);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            draw();
+        }
+        
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(gameLoop);
+            clearInterval(timerInterval);
+            
+            playGameOverSound();
+            
+            // Check high score
+            let isNewHighScore = false;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snakeHighScore', highScore);
+                document.getElementById('highscore').textContent = highScore;
+                isNewHighScore = true;
+            }
+            
+            // Show game over overlay
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('newHighscore').style.display = isNewHighScore ? 'block' : 'none';
+            document.getElementById('gameOverOverlay').classList.add('active');
+            
+            // Generate NFT
+            generateNFT(score);
+        }
+        
+        function resetGame() {
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('resetBtn').style.display = 'none';
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw start screen
+            ctx.fillStyle = '#ff0080';
+            ctx.font = '24px "Press Start 2P"';
+            ctx.textAlign = 'center';
+            ctx.fillText('🐍 SNAKE', canvas.width/2, canvas.height/2 - 20);
+            ctx.fillStyle = '#aaa';
+            ctx.font = '12px "Press Start 2P"';
+            ctx.fillText('Klik Mulai Main!', canvas.width/2, canvas.height/2 + 20);
+        }
+        
+        function playAgain() {
+            document.getElementById('gameOverOverlay').classList.remove('active');
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('resetBtn').style.display = 'none';
+            resetGame();
+        }
+        
+        // ===== CONTROLS =====
+        document.addEventListener('keydown', (e) => {
+            if (!isPlaying) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    if (direction !== 'down') nextDirection = 'up';
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    if (direction !== 'up') nextDirection = 'down';
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    if (direction !== 'right') nextDirection = 'left';
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    if (direction !== 'left') nextDirection = 'right';
+                    break;
+            }
+            e.preventDefault();
+        });
+        
+        // ===== NFT GENERATOR =====
+        const NFT_NAMES = [
+            'Crypto Snake', 'Neon Viper', 'Pixel Python', 'Galaxy Serpent',
+            'Rainbow Cobra', 'Storm Adder', 'Mystic Mamba', 'Cyber Boa',
+            'Cosmic Snake', 'Turbo Python', 'Epic Viper', 'Mega Serpent'
+        ];
+        
+        const BODY_PATTERNS = ['solid', 'striped', 'dotted', 'zigzag', 'gradient'];
+        const BG_STYLES = ['galaxy', 'neon', 'sunset', 'ocean', 'fire', 'matrix'];
+        
+        function generateNFT(finalScore) {
+            const nftCanvas = document.getElementById('nftCanvas');
+            const nctx = nftCanvas.getContext('2d');
+            const size = 200;
+            
+            // Random traits
+            const bodyColor1 = `hsl(${Math.random()*360}, 80%, 60%)`;
+            const bodyColor2 = `hsl(${Math.random()*360}, 90%, 50%)`;
+            const pattern = BODY_PATTERNS[Math.floor(Math.random() * BODY_PATTERNS.length)];
+            const bgStyle = BG_STYLES[Math.floor(Math.random() * BG_STYLES.length)];
+            const snakeName = NFT_NAMES[Math.floor(Math.random() * NFT_NAMES.length)];
+            
+            // Rarity based on score
+            let rarity, rarityColor;
+            if (finalScore >= 200) { rarity = 'LEGENDARY'; rarityColor = '#ffdd00'; }
+            else if (finalScore >= 150) { rarity = 'EPIC'; rarityColor = '#a855f7'; }
+            else if (finalScore >= 100) { rarity = 'RARE'; rarityColor = '#3b82f6'; }
+            else if (finalScore >= 50) { rarity = 'UNCOMMON'; rarityColor = '#22c55e'; }
+            else { rarity = 'COMMON'; rarityColor = '#9ca3af'; }
+            
+            // Draw background
+            switch(bgStyle) {
+                case 'galaxy':
+                    const grad = nctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+                    grad.addColorStop(0, '#1a1a3e');
+                    grad.addColorStop(1, '#0a0a1e');
+                    nctx.fillStyle = grad;
+                    nctx.fillRect(0, 0, size, size);
+                    // Stars
+                    for (let i = 0; i < 30; i++) {
+                        nctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
+                        nctx.beginPath();
+                        nctx.arc(Math.random()*size, Math.random()*size, Math.random()*2, 0, Math.PI*2);
+                        nctx.fill();
+                    }
+                    break;
+                case 'neon':
+                    nctx.fillStyle = '#0a0a0a';
+                    nctx.fillRect(0, 0, size, size);
+                    nctx.strokeStyle = '#ff0080';
+                    nctx.lineWidth = 2;
+                    for (let i = 0; i < 5; i++) {
+                        nctx.beginPath();
+                        nctx.arc(size/2, size/2, 20 + i*15, 0, Math.PI*2);
+                        nctx.stroke();
+                    }
+                    break;
+                case 'sunset':
+                    const sunset = nctx.createLinearGradient(0, 0, 0, size);
+                    sunset.addColorStop(0, '#ff6b35');
+                    sunset.addColorStop(0.5, '#ff0080');
+                    sunset.addColorStop(1, '#1a1a2e');
+                    nctx.fillStyle = sunset;
+                    nctx.fillRect(0, 0, size, size);
+                    break;
+                case 'ocean':
+                    const ocean = nctx.createLinearGradient(0, 0, 0, size);
+                    ocean.addColorStop(0, '#0077b6');
+                    ocean.addColorStop(1, '#023e8a');
+                    nctx.fillStyle = ocean;
+                    nctx.fillRect(0, 0, size, size);
+                    break;
+                case 'fire':
+                    const fire = nctx.createLinearGradient(0, 0, 0, size);
+                    fire.addColorStop(0, '#ff4500');
+                    fire.addColorStop(0.5, '#ff0000');
+                    fire.addColorStop(1, '#8b0000');
+                    nctx.fillStyle = fire;
+                    nctx.fillRect(0, 0, size, size);
+                    break;
+                case 'matrix':
+                    nctx.fillStyle = '#000a00';
+                    nctx.fillRect(0, 0, size, size);
+                    nctx.fillStyle = '#00ff00';
+                    nctx.font = '10px monospace';
+                    for (let i = 0; i < 50; i++) {
+                        nctx.globalAlpha = Math.random();
+                        nctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), 
+                            Math.random()*size, Math.random()*size);
+                    }
+                    nctx.globalAlpha = 1;
+                    break;
+            }
+            
+            // Draw snake NFT
+            nctx.save();
+            nctx.translate(size/2 - 30, size/2 - 10);
+            
+            // Snake body
+            const segments = 8;
+            for (let i = segments - 1; i >= 0; i--) {
+                const x = i * 8;
+                const y = Math.sin(i * 0.8) * 10;
+                
+                const bodyGrad = nctx.createRadialGradient(x, y, 0, x, y, 10);
+                bodyGrad.addColorStop(0, bodyColor1);
+                bodyGrad.addColorStop(1, bodyColor2);
+                
+                nctx.fillStyle = bodyGrad;
+                nctx.shadowColor = bodyColor1;
+                nctx.shadowBlur = i === 0 ? 15 : 5;
+                
+                nctx.beginPath();
+                nctx.roundRect(x - 5, y - 5, 12, 12, 4);
+                nctx.fill();
+                
+                // Pattern
+                nctx.shadowBlur = 0;
+                if (pattern === 'striped' && i % 2 === 0) {
+                    nctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    nctx.fillRect(x - 3, y - 5, 3, 10);
+                } else if (pattern === 'dotted') {
+                    nctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    nctx.beginPath();
+                    nctx.arc(x, y, 2, 0, Math.PI*2);
+                    nctx.fill();
+                } else if (pattern === 'zigzag' && i % 2 === 0) {
+                    nctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                    nctx.lineWidth = 1;
+                    nctx.beginPath();
+                    nctx.moveTo(x-3, y-3);
+                    nctx.lineTo(x, y+3);
+                    nctx.lineTo(x+3, y-3);
+                    nctx.stroke();
+                }
+                
+                // Eyes on head
+                if (i === 0) {
+                    nctx.fillStyle = 'white';
+                    nctx.beginPath();
+                    nctx.arc(x + 2, y - 3, 3, 0, Math.PI*2);
+                    nctx.arc(x + 2, y + 3, 3, 0, Math.PI*2);
+                    nctx.fill();
+                    nctx.fillStyle = '#000';
+                    nctx.beginPath();
+                    nctx.arc(x + 3, y - 3, 1.5, 0, Math.PI*2);
+                    nctx.arc(x + 3, y + 3, 1.5, 0, Math.PI*2);
+                    nctx.fill();
+                }
+            }
+            nctx.restore();
+            
+            // Rarity border
+            nctx.strokeStyle = rarityColor;
+            nctx.lineWidth = 4;
+            nctx.strokeRect(2, 2, size - 4, size - 4);
+            
+            // Rarity label
+            nctx.fillStyle = rarityColor;
+            nctx.font = 'bold 12px "Press Start 2P"';
+            nctx.textAlign = 'center';
+            nctx.shadowColor = rarityColor;
+            nctx.shadowBlur = 10;
+            nctx.fillText(rarity, size/2, 20);
+            nctx.shadowBlur = 0;
+            
+            // Score badge
+            nctx.fillStyle = 'rgba(0,0,0,0.6)';
+            nctx.beginPath();
+            nctx.roundRect(5, size - 30, 80, 22, 10);
+            nctx.fill();
+            nctx.fillStyle = '#ffdd00';
+            nctx.font = '10px "Press Start 2P"';
+            nctx.textAlign = 'left';
+            nctx.fillText(`⭐ ${finalScore}`, 12, size - 13);
+            
+            // Update NFT info
+            document.getElementById('nftName').textContent = `${snakeName} #${Math.floor(Math.random()*9999)}`;
+            document.getElementById('nftTraits').innerHTML = `
+                <span>🎨 ${pattern}</span>
+                <span>🌌 ${bgStyle}</span>
+                <span style="color:${rarityColor};font-weight:bold">${rarity}</span>
+            `;
+        }
+        
+        function downloadNFT() {
+            const nftCanvas = document.getElementById('nftCanvas');
+            const link = document.createElement('a');
+            link.download = `snake-nft-${Date.now()}.png`;
+            link.href = nftCanvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Initial draw
+        resetGame();
+    </script>
+</body>
+</html>
